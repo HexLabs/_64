@@ -1,10 +1,7 @@
-use {
-    crate::{
-        gl::*,
-        resource::texture::{Format, Texture},
-        Resource, Target,
-    },
-    log_64 as log,
+use crate::{
+    gl::*,
+    resource::texture::{Format, Texture},
+    Resource, Target,
 };
 
 pub const SWAP_CHAIN: Framebuffer = Framebuffer(0);

@@ -1,7 +1,6 @@
 use {
     crate::{gl::*, Resource},
     core::marker::PhantomData,
-    log_64 as log,
 };
 
 pub type TextureRgb = Texture<[f32; 3]>;

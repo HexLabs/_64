@@ -2,11 +2,39 @@
     not(feature = "std"),
     no_std,
     feature(lang_items),
-    feature(naked_functions),
-    feature(default_alloc_error_handler),
-    feature(const_cstr_methods)
+    feature(naked_functions)
 )]
 pub use {gfx_64, gui_64, math_64, sdl_64};
+
+#[cfg(feature = "std")]
+pub mod log {
+    extern crate std;
+    use log::*;
+
+    pub fn init() {
+        static LOGGER: Log = Log;
+        log::set_logger(&LOGGER)
+            .map(|()| log::set_max_level(LevelFilter::Debug))
+            .expect("failed to init logs");
+        log::info!("Greetz");
+    }
+
+    struct Log;
+
+    impl log::Log for Log {
+        fn enabled(&self, metadata: &Metadata) -> bool {
+            metadata.level() <= Level::Debug
+        }
+
+        fn log(&self, record: &Record) {
+            if self.enabled(record.metadata()) {
+                println!("[{:>5}] {}", record.level(), record.args());
+            }
+        }
+
+        fn flush(&self) {}
+    }
+}
 
 #[cfg(not(feature = "std"))]
 pub mod min_build {

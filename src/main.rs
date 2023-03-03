@@ -1,11 +1,11 @@
+#![feature(const_cstr_methods)]
 #![cfg_attr(
     not(feature = "std"),
     no_std,
     no_main,
     feature(lang_items),
     feature(naked_functions),
-    feature(default_alloc_error_handler),
-    feature(const_cstr_methods)
+    feature(default_alloc_error_handler)
 )]
 use core::ffi::{c_char, CStr};
 
@@ -35,12 +35,12 @@ use {
 
 #[cfg(not(feature = "std"))]
 #[allow(unused_imports)]
-use project_64::min_build::*;
+use _64::min_build::*;
 
 #[cfg_attr(not(feature = "std"), no_mangle)]
 pub fn main() {
-    #[cfg(feature = "log")]
-    simple_log::init();
+    #[cfg(feature = "std")]
+    _64::log::init();
 
     #[cfg(not(feature = "std"))]
     mem_64::init();
@@ -70,8 +70,8 @@ pub fn main() {
     let mut events = EventFeed;
     events.text_input(true);
 
-    #[cfg(feature = "log")]
-    simple_log::set_max_level(simple_log::LevelFilter::Off);
+    #[cfg(feature = "std")]
+    log::set_max_level(log::LevelFilter::Off);
 
     loop {
         match events.next() {

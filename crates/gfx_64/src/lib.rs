@@ -12,7 +12,7 @@ mod gl {
 
 pub use resource::*;
 
-use {crate::gl::*, log_64 as log, math_64::Matrix};
+use {crate::gl::*,  math_64::Matrix};
 
 pub use resource::framebuffer::SWAP_CHAIN;
 
