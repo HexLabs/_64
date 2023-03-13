@@ -30,7 +30,7 @@ sdl_64 = { path = "crates/sdl_64" }
 
 
 [features]
-std = []
+std = [ "dep:log" ]
 
 [profile.release]
 panic = "abort"

@@ -6,7 +6,7 @@ pub enum Event {
     Keyboard {
         down: bool,
         timestamp: u32,
-        sym: i32,
+        sym: KeyCode,
         mod_: u32,
     },
     TextInput {
@@ -14,9 +14,16 @@ pub enum Event {
     },
 }
 
-pub struct EventFeed;
+#[repr(u32)]
+#[derive(Debug, Copy, Clone, PartialEq)]
+pub enum KeyCode {
+    CapsLock = SDLK_CAPSLOCK,
+    None,
+}
 
-impl EventFeed {
+pub struct EventChannel;
+
+impl EventChannel {
     pub fn text_input(&self, enable: bool) {
         unsafe {
             if enable {
@@ -28,7 +35,7 @@ impl EventFeed {
     }
 }
 
-impl Iterator for EventFeed {
+impl Iterator for EventChannel {
     type Item = Event;
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -55,7 +62,10 @@ impl Iterator for EventFeed {
                         Some(Event::Keyboard {
                             down,
                             timestamp,
-                            sym,
+                            sym: match sym as u32 {
+                                SDLK_CAPSLOCK => KeyCode::CapsLock,
+                                _ => KeyCode::None,
+                            },
                             mod_: mod_ as _,
                         })
                     }

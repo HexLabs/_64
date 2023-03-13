@@ -24,12 +24,14 @@ pub trait Target: Resource {
     fn clear_color(&self, [r, g, b, a]: [f32; 4]) {
         unsafe {
             glClearColor(r, g, b, a);
+            glClear(GL_COLOR_BUFFER_BIT);
         }
     }
 
     fn clear_stencil(&self, clear: i32) {
         unsafe {
             glClearStencil(clear);
+            glClear(GL_STENCIL_BUFFER_BIT);
         }
     }
 

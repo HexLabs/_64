@@ -9,7 +9,7 @@ pub use {gfx_64, gui_64, math_64, sdl_64};
 #[cfg(feature = "std")]
 pub mod log {
     extern crate std;
-    use log::*;
+    pub use log::*;
 
     pub fn init() {
         static LOGGER: Log = Log;

@@ -7,17 +7,8 @@
     feature(naked_functions),
     feature(default_alloc_error_handler)
 )]
-use core::ffi::{c_char, CStr};
-
-const NAME_PTR: *const c_char = {
-    const BYTES: &[u8] = b"Hello, world!\0";
-    BYTES.as_ptr().cast()
-};
-const NAME: &CStr = unsafe { CStr::from_ptr(NAME_PTR) };
-const WIDTH: i32 = 1920;
-const HEIGHT: i32 = 1080;
-
 use {
+    core::ffi::{c_char, CStr},
     gfx_64::{
         resource::{
             mesh::{Mesh, Topology, Usage},
@@ -28,19 +19,29 @@ use {
     },
     gui_64::text::TextSystem,
     sdl_64::{
-        event::{Event, EventFeed},
+        event::{Event, EventChannel, KeyCode},
         window::Window,
     },
 };
 
+#[cfg(feature = "std")]
+use _64::log;
 #[cfg(not(feature = "std"))]
 #[allow(unused_imports)]
 use _64::min_build::*;
 
+const NAME_PTR: *const c_char = {
+    const BYTES: &[u8] = b"Hello, world!\0";
+    BYTES.as_ptr().cast()
+};
+const NAME: &CStr = unsafe { CStr::from_ptr(NAME_PTR) };
+const WIDTH: i32 = 1920;
+const HEIGHT: i32 = 1080;
+
 #[cfg_attr(not(feature = "std"), no_mangle)]
 pub fn main() {
     #[cfg(feature = "std")]
-    _64::log::init();
+    log::init();
 
     #[cfg(not(feature = "std"))]
     mem_64::init();
@@ -67,17 +68,24 @@ pub fn main() {
     let glyph_prog = Program::new(POS2D_TEX2D, TEX2D);
     glyph_prog.bind();
 
-    let mut events = EventFeed;
+    let mut events = EventChannel;
     events.text_input(true);
 
-    #[cfg(feature = "std")]
-    log::set_max_level(log::LevelFilter::Off);
-
+    let mut edit = true;
     loop {
+        #[cfg(feature = "std")]
+        log::set_max_level(log::LevelFilter::Debug);
+
         match events.next() {
             Some(event) => match event {
                 Event::Quit => {
                     break;
+                }
+
+                Event::Keyboard { down, sym, .. } if sym == KeyCode::CapsLock && down => {
+                    edit = !edit;
+                    #[cfg(feature = "std")]
+                    log::debug!("Toggling edit mode to {}", edit);
                 }
 
                 _ => {}
@@ -86,18 +94,33 @@ pub fn main() {
             None => {}
         };
 
+        #[cfg(feature = "std")]
+        log::set_max_level(log::LevelFilter::Off);
+
         SWAP_CHAIN.bind();
         SWAP_CHAIN.clear_color([0.0, 0.0, 0.0, 1.0]);
         SWAP_CHAIN.viewport([0, 0], [WIDTH, HEIGHT]);
-        greets.view().bind();
-        tex_quad.draw();
+
+        if edit {
+            #[cfg(feature = "std")]
+            log::set_max_level(log::LevelFilter::Debug);
+            #[cfg(feature = "std")]
+            log::debug!("Drawing UI");
+            #[cfg(feature = "std")]
+            log::set_max_level(log::LevelFilter::Off);
+
+            greets.view().bind();
+            tex_quad.draw();
+        }
         window.swap();
     }
 
-    /*
     #[cfg(not(feature = "std"))]
     unsafe {
+        extern "C" {
+            fn exit(status: u32);
+        }
+
         exit(0);
     }
-    */
 }
